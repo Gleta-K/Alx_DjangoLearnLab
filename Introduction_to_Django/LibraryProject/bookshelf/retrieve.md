@@ -3,11 +3,5 @@
 ```python
 from bookshelf.models import Book
 
-Book.objects.all()
-```
-
-# Output
-
-```text
-<QuerySet [<Book: 1984>]>
-```
+book = Book.objects.get(title="1984")
+print(book.title, book.author, book.publication_year)
