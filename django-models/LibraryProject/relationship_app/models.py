@@ -3,6 +3,8 @@ from django.db import models
 # Create your models here.
 class Author(models.Model):
     name = models.CharField()
+    def _str_(self):
+        return self.name
 
 class Book(models.Model):
     title = models.CharField()
