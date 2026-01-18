@@ -9,4 +9,4 @@ library = Library.objects.get(name=library_name)
 books = library.books.all()
 
 #librarian
-librarian = Librarian.objects.get(library = library)
+librarian = Librarian.objects.get(library=library)
