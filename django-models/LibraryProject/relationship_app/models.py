@@ -7,8 +7,11 @@ class Author(models.Model):
         return self.name
 
 class Book(models.Model):
-    title = models.CharField()
-    author = models.ForeignKey(Author, on_delete= models.CASCADE, related_name= "Book")
+    library = models.ForeignKey(
+        Library,
+        on_delete=models.CASCADE,
+        related_name="books"
+    )
 
 class Library(models.Model):
     name = models.CharField()
