@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-)#ah$#&p)s^2y-t&#v%(jw%dgfehbl74br70t-y%g0k3i)t7v2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#DEBUG = True
 
-ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -120,7 +120,25 @@ STATIC_URL = 'static/'
 
 AUTH_USER_MODEL = "bookshelf.CustomUser"
 
-AUTHENTICATION_BACKENDS = [
+"""AUTHENTICATION_BACKENDS = [
     'accounts.backends.DateOfBirthBackend',
     'accounts.backends.ProfilePhotoBackend'
-]
+]"""
+
+# SECURITY SETTINGS
+
+DEBUG = False  # NEVER True in production
+
+ALLOWED_HOSTS = ["*"]  # replace with your domain later
+
+# Browser security
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+
+# HTTPS cookie protection
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+# CSRF protection
+CSRF_USE_SESSIONS = True
