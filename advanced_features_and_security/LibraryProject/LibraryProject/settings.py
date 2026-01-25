@@ -142,3 +142,38 @@ SESSION_COOKIE_SECURE = True
 
 # CSRF protection
 CSRF_USE_SESSIONS = True
+
+SECURE_REFERRER_POLICY = "strict-origin"
+
+# Content Security Policy (basic)
+CSP_DEFAULT_SRC = ("'self'",)
+# CSP reduces XSS risk by limiting where scripts and content can load from.
+
+
+"""
+SECURITY IMPLEMENTATION NOTES
+
+- CSRF protection enforced using {% csrf_token %} in templates
+- Permissions enforced using @permission_required decorators
+- Django ORM used to prevent SQL injection
+- Secure cookies enabled via SESSION_COOKIE_SECURE and CSRF_COOKIE_SECURE
+- Browser protections enabled (XSS filter, nosniff, X-Frame-Options)
+"""
+
+# HTTPS & SECURITY SETTINGS
+
+# Redirect all HTTP requests to HTTPS
+SECURE_SSL_REDIRECT = True
+
+# HTTP Strict Transport Security (HSTS)
+# Instructs browsers to only access the site via HTTPS for 1 year
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+
+# Apply HSTS policy to all subdomains
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+# Allow the site to be included in browsers' HSTS preload list
+SECURE_HSTS_PRELOAD = True
+
+# SECURE COOKIES
+
