@@ -2,66 +2,41 @@ from django.shortcuts import render
 
 # Create your views here.
 from rest_framework import generics, permissions
+from rest_framework.exceptions import ValidationError
 from .models import Book
 from .serializers import BookSerializer
 
 
-class BookListView(generics.ListAPIView):
-    """
-    GET /books/
-
-    Returns a list of all books.
-    Accessible to anyone (authenticated or not).
-    """
-    queryset = Book.objects.all()
-    serializer_class = BookSerializer
-    permission_classes = [permissions.AllowAny]
-
-
-class BookDetailView(generics.RetrieveAPIView):
-    """
-    GET /books/<id>/
-
-    Returns details of a single book by ID.
-    Accessible to anyone.
-    """
-    queryset = Book.objects.all()
-    serializer_class = BookSerializer
-    permission_classes = [permissions.AllowAny]
-
-
-class BookCreateView(generics.CreateAPIView):
-    """
-    POST /books/create/
-
-    Creates a new book.
-    Restricted to authenticated users only.
-    """
-    queryset = Book.objects.all()
-    serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-
 class BookUpdateView(generics.UpdateAPIView):
     """
-    PUT /books/<id>/update/
-    PATCH /books/<id>/update/
+    PUT /books/update/
+    PATCH /books/update/
 
-    Updates an existing book.
-    Restricted to authenticated users.
+    Expects book ID in request body.
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        book_id = self.request.data.get('id')
+        if not book_id:
+            raise ValidationError({"id": "Book ID is required for update."})
+        return Book.objects.get(id=book_id)
 
 
 class BookDeleteView(generics.DestroyAPIView):
     """
-    DELETE /books/<id>/delete/
+    DELETE /books/delete/
 
-    Deletes a book.
-    Restricted to authenticated users.
+    Expects book ID in request body.
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        book_id = self.request.data.get('id')
+        if not book_id:
+            raise ValidationError({"id": "Book ID is required for deletion."})
+        return Book.objects.get(id=book_id)
