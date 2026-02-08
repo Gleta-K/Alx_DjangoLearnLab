@@ -7,36 +7,55 @@ from .models import Book
 from .serializers import BookSerializer
 
 
-class BookUpdateView(generics.UpdateAPIView):
+class ListView(generics.ListAPIView):
+    """
+    GET /books/
+    Public access.
+    """
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class DetailView(generics.RetrieveAPIView):
+    """
+    GET /books/<id>/
+    Public access.
+    """
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class CreateView(generics.CreateAPIView):
+    """
+    POST /books/create/
+    Authenticated users only.
+    """
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class UpdateView(generics.UpdateAPIView):
     """
     PUT /books/update/
-    PATCH /books/update/
-
-    Expects book ID in request body.
+    Authenticated users only.
     """
     queryset = Book.objects.all()
-    serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_object(self):
-        book_id = self.request.data.get('id')
-        if not book_id:
-            raise ValidationError({"id": "Book ID is required for update."})
-        return Book.objects.get(id=book_id)
 
 
-class BookDeleteView(generics.DestroyAPIView):
+class DeleteView(generics.DestroyAPIView):
     """
     DELETE /books/delete/
-
-    Expects book ID in request body.
+    Authenticated users only.
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
-        book_id = self.request.data.get('id')
+        book_id = self.request.data.get("id")
         if not book_id:
-            raise ValidationError({"id": "Book ID is required for deletion."})
+            raise ValidationError({"id": "Book ID is required"})
         return Book.objects.get(id=book_id)
