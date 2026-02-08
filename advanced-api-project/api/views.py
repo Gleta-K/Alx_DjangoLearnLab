@@ -1,7 +1,8 @@
 from django.shortcuts import render
 
 # Create your views here.
-from rest_framework import generics, permissions
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.exceptions import ValidationError
 from .models import Book
 from .serializers import BookSerializer
@@ -10,21 +11,21 @@ from .serializers import BookSerializer
 class ListView(generics.ListAPIView):
     """
     GET /books/
-    Public access.
+    Read-only for unauthenticated users.
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class DetailView(generics.RetrieveAPIView):
     """
     GET /books/<id>/
-    Public access.
+    Read-only for unauthenticated users.
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class CreateView(generics.CreateAPIView):
@@ -34,7 +35,7 @@ class CreateView(generics.CreateAPIView):
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class UpdateView(generics.UpdateAPIView):
@@ -43,6 +44,14 @@ class UpdateView(generics.UpdateAPIView):
     Authenticated users only.
     """
     queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        book_id = self.request.data.get("id")
+        if not book_id:
+            raise ValidationError({"id": "Book ID is required"})
+        return Book.objects.get(id=book_id)
 
 
 class DeleteView(generics.DestroyAPIView):
@@ -52,7 +61,7 @@ class DeleteView(generics.DestroyAPIView):
     """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         book_id = self.request.data.get("id")
