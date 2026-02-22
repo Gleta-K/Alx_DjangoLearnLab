@@ -1,6 +1,9 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
+from notifications.models import Notification
 
 CustomUser = get_user_model()
 
@@ -10,27 +13,29 @@ class FollowUserView(generics.GenericAPIView):
     queryset = CustomUser.objects.all()
 
     def post(self, request, user_id):
-        try:
-            user = CustomUser.objects.get(id=user_id)
+        user_to_follow = get_object_or_404(CustomUser, id=user_id)
 
-            if user == request.user:
-                return Response(
-                    {"error": "You cannot follow yourself."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            request.user.following.add(user)
-
+        if user_to_follow == request.user:
             return Response(
-                {"message": "User followed successfully."},
-                status=status.HTTP_200_OK
+                {"detail": "You cannot follow yourself."},
+                status=status.HTTP_400_BAD_REQUEST
             )
 
-        except CustomUser.DoesNotExist:
-            return Response(
-                {"error": "User not found."},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        request.user.following.add(user_to_follow)
+
+        # Create notification
+        Notification.objects.create(
+            recipient=user_to_follow,
+            actor=request.user,
+            verb="started following you",
+            content_type=ContentType.objects.get_for_model(user_to_follow),
+            object_id=user_to_follow.id,
+        )
+
+        return Response(
+            {"detail": "User followed successfully."},
+            status=status.HTTP_200_OK
+        )
 
 
 class UnfollowUserView(generics.GenericAPIView):
@@ -38,18 +43,11 @@ class UnfollowUserView(generics.GenericAPIView):
     queryset = CustomUser.objects.all()
 
     def post(self, request, user_id):
-        try:
-            user = CustomUser.objects.get(id=user_id)
+        user_to_unfollow = get_object_or_404(CustomUser, id=user_id)
 
-            request.user.following.remove(user)
+        request.user.following.remove(user_to_unfollow)
 
-            return Response(
-                {"message": "User unfollowed successfully."},
-                status=status.HTTP_200_OK
-            )
-
-        except CustomUser.DoesNotExist:
-            return Response(
-                {"error": "User not found."},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        return Response(
+            {"detail": "User unfollowed successfully."},
+            status=status.HTTP_200_OK
+        )
