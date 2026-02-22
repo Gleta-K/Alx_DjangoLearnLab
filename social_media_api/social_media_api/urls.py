@@ -24,4 +24,3 @@ urlpatterns = [
 from django.urls import path, include
     path('api/', include('posts.urls')),
 ]
-
