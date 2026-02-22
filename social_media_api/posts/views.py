@@ -1,13 +1,12 @@
-from django.shortcuts import render
+from rest_framework import generics, permissions
 from .models import Post
+from .serializers import PostSerializer
 
-def feed_view(request):
-    user = request.user
-    
-    # Get users the current user is following
-    following_users = user.following.all()
-    
-    # Get posts from those users, ordered by newest first
-    posts = Post.objects.filter(author__in=following_users).order_by('-created_at')
-    
-    return render(request, 'posts/feed.html', {'posts': posts})
+
+class PostFeedView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        following_users = self.request.user.following.all()
+        return Post.objects.filter(author__in=following_users).order_by('-created_at')
